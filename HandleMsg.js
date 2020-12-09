@@ -46,7 +46,7 @@ const { uploadImages } = require('./utils/fetcher')
 
 const fs = require('fs-extra')
 const banned = JSON.parse(fs.readFileSync('./settings/banned.json'))
-const simi = JSON.parse(fs.readFileSync('./settings/simi.json'))
+/* const simi = JSON.parse(fs.readFileSync('./settings/simi.json')) */
 const ngegas = JSON.parse(fs.readFileSync('./settings/ngegas.json'))
 const setting = JSON.parse(fs.readFileSync('./settings/setting.json'))
 
@@ -59,7 +59,7 @@ let {
 
 const {
     apiNoBg,
-	apiSimi
+/*	apiSimi */
 } = JSON.parse(fs.readFileSync('./settings/api.json'))
 
 function formatin(duit){
@@ -107,7 +107,7 @@ module.exports = HandleMsg = async (pakforlay, message) => {
 		// [IDENTIFY]
 		const isOwnerBot = ownerNumber.includes(pengirim)
         const isBanned = banned.includes(pengirim)
-		const isSimi = simi.includes(chatId)
+	/*	const isSimi = simi.includes(chatId) */
 		const isNgegas = ngegas.includes(chatId)
 		const isKasar = await cariKasar(chats)
 
@@ -333,7 +333,7 @@ module.exports = HandleMsg = async (pakforlay, message) => {
                         hehex += '╠➥ '
                         hehex += response.data.data[i].name.transliteration.id.toLowerCase() + '\n'
                             }
-                        hehex += '╚═〘 *A R U G A  B O T* 〙'
+                        hehex += '╚═〘 *Yaelahdo  B O T* 〙'
                     pakforlay.reply(from, hehex, id)
                 })
             } catch(err) {
@@ -471,41 +471,60 @@ module.exports = HandleMsg = async (pakforlay, message) => {
             })
             break
         //Media
-        case 'instagram':
-            if (args.length == 0) return pakforlay.reply(from, `Untuk mendownload gambar atau video dari instagram\nketik: ${prefix}instagram [link_ig]`, id)
+	case 'twimg':
+            if (args.length == 0) return pakforlay.reply(from, `Untuk mendownload gambar dari twitter\nketik: ${prefix}twimg [link_twitter]`, id)
+            const twimg = await rugaapi.twitimg(args[0])
+            await pakforlay.sendFileFromUrl(from, twimg, 'Sukses mengunduh Foto Twitter Menggunakan Bot WhatsApp PakForlay', '', id)
+            .catch(() => {
+                pakforlay.reply(from, 'Ada yang Error!', id)
+            })
+        case 'twvid':
+            if (args.length == 0) return pakforlay.reply(from, `Untuk mendownload video dari twitter\nketik: ${prefix}twvid [link_twitter]`, id)
+			await pakforlay.reply(from, `_Tunggu, sedang memproses perintah_`, id)
+            const twvid = await rugaapi.twitvid(args[0])
+            await pakforlay.sendFileFromUrl(from, twvid, 'Sukses mengunduh Video Twitter Menggunakan Bot WhatsApp PakForlay', '', id)
+            .catch(() => {
+                pakforlay.reply(from, 'Ada yang Error!', id)
+            })
+        case 'insta':
+		case 'ig':
+            if (args.length == 0) return pakforlay.reply(from, `Untuk mendownload gambar atau video dari instagram\nketik: ${prefix}insta [link_ig]`, id)
+			await pakforlay.reply(from, `_Tunggu, sedang memproses perintah_`, id)
             const instag = await rugaapi.insta(args[0])
-            await pakforlay.sendFileFromUrl(from, instag, '', '', id)
+            await pakforlay.sendFileFromUrl(from, instag, 'Sukses mengunduh Foto/Video Instagram Menggunakan Bot WhatsApp PakForlay', '', id)
             .catch(() => {
                 pakforlay.reply(from, 'Ada yang Error!', id)
             })
             break
 		case 'tiktok':
-            if (args.length == 0) return pakforlay.reply(from, `Untuk mendownload gambar atau video dari instagram\nketik: ${prefix}instagram [link_tik]`, id)
-            const tik = await rugaapi.tiktok(args[0])
-            await pakforlay.sendFileFromUrl(from, tik, 'Sukses mengunduh Video Tiktok tanpa Watermark Menggunakan Bot WhatsApp PakForlay', '', id)
+            if (args.length == 0) return pakforlay.reply(from, `Untuk mendownload video tiktok\nketik: ${prefix}tiktok [link_tik]`, id)
+			await pakforlay.reply(from, `_Tunggu, sedang memproses perintah_`, id)
+            const vidTiktok = await rugaapi.tiktok(args[0])
+			const infoTiktok = await rugaapi.tiktokInfo(args[0])
+			await pakforlay.sendFileFromUrl(from, vidTiktok, '', '', id)
+			await pakforlay.sendText(from, infoTiktok, '', '', id)
             .catch(() => {
                 pakforlay.reply(from, 'Ada yang Error!', id)
             })
             break
-        case 'ytmp3':
-            if (args.length == 0) return pakforlay.reply(from, `Untuk mendownload lagu dari youtube\nketik: ${prefix}ytmp3 [link_yt]`, id)
-            rugaapi.ytmp3(args[0])
-            .then(async(res) => {
-				if (res.status == 'error') return pakforlay.sendFileFromUrl(from, `${res.link}`, '', `${res.judul}`, id)
-				if (res.status == 'filesize') return pakforlay.sendFileFromUrl(from, `${res.link}`, '', `${res.judul}`, id)
-				await pakforlay.sendFileFromUrl(from, `${res.thumb}`, '', `Youtube ditemukan\n\nJudul: ${res.judul}\n\nUkuran: ${res.size}\n\nAudio sedang dikirim`, id)
-				await pakforlay.sendFileFromUrl(from, `${res.link}`, '', '', id)
-			})
+        case 'ytmus':
+            if (args.length == 0) return pakforlay.reply(from, `Untuk mendownload video youtube\nketik: ${prefix}ytmus [link_youtube]`, id)
+            await pakforlay.reply(from, `_Tunggu, sedang memproses perintah_`, id)
+            const ytmus = await rugaapi.ytmp3(args[0])
+            await pakforlay.sendFileFromUrl(from, ytmus, '', '', id)
+			await pakforlay.reply(from, `_Sukses Mengunduh Audio Dari Youtube._`, id)
+            .catch(() => {
+                pakforlay.reply(from, 'Ada yang Error!', id)
+            })
             break
-        case 'ytmp4':
-            if (args.length == 0) return pakforlay.reply(from, `Untuk mendownload video dari youtube\nketik: ${prefix}ytmp3 [link_yt]`)
-            rugaapi.ytmp4(args[0])
-            .then(async(res) => {
-				if (res.status == 'error') return pakforlay.sendFileFromUrl(from, `${res.link}`, '', `${res.judul}`, id)
-				if (res.status == 'filesize') return pakforlay.sendFileFromUrl(from, `${res.link}`, '', `${res.judul}`, id)
-				await pakforlay.sendFileFromUrl(from, `${res.thumb}`, '', `Youtube ditemukan\n\nJudul: ${res.judul}\n\nUkuran: ${res.size}\n\nVideo sedang dikirim`, id)
-				await pakforlay.sendFileFromUrl(from, `${res.link}`, '', '', id)
-			})
+		case 'ytvid':
+            if (args.length == 0) return pakforlay.reply(from, `Untuk mendownload video youtube\nketik: ${prefix}ytvid [link_youtube]`, id)
+			await pakforlay.reply(from, `_Tunggu, sedang memproses perintah_`, id)
+            const youtube = await rugaapi.ytvid(args[0])
+            await pakforlay.sendFileFromUrl(from, youtube, `Sukses mengunduh Video Youtube Menggunakan Bot WhatsApp PakForlay`, id)
+            .catch(() => {
+                pakforlay.reply(from, 'Ada yang Error!, mungkin bisa kirim ulang perintah.', id)
+            })
             break
 			
 		//Primbon Menu
@@ -657,6 +676,7 @@ module.exports = HandleMsg = async (pakforlay, message) => {
                 pakforlay.reply(from, 'Ada yang Error!', id)
             }) */
             break
+		/*
         case 'stalkig':
             if (args.length == 0) return pakforlay.reply(from, `Untuk men-stalk akun instagram seseorang\nketik ${prefix}stalkig [username]\ncontoh: ${prefix}stalkig ini.arga`, id)
             const igstalk = await rugaapi.stalkig(args[0])
@@ -666,6 +686,7 @@ module.exports = HandleMsg = async (pakforlay, message) => {
                 pakforlay.reply(from, 'Ada yang Error!', id)
             })
             break
+		*/
         case 'wiki':
             if (args.length == 0) return pakforlay.reply(from, `Untuk mencari suatu kata dari wikipedia\nketik: ${prefix}wiki [kata]`, id)
             const wikip = body.slice(6)
@@ -914,10 +935,10 @@ module.exports = HandleMsg = async (pakforlay, message) => {
                 hehex += '╠➥'
                 hehex += ` @${groupMem[i].id.replace(/@c.us/g, '')}\n`
             }
-            hehex += '╚═〘 *A R U G A  B O T* 〙'
+            hehex += '╚═〘 *Yaelahdo  B O T* 〙'
             await pakforlay.sendTextWithMentions(from, hehex)
             break
-		case 'simisimi':
+	/*	case 'simisimi':
 			if (!isGroupMsg) return pakforlay.reply(from, 'Maaf, perintah ini hanya dapat dipakai didalam grup!', id)
 			pakforlay.reply(from, `Untuk mengaktifkan simi-simi pada Group Chat\n\nPenggunaan\n${prefix}simi on --mengaktifkan\n${prefix}simi off --nonaktifkan\n`, id)
 			break
@@ -937,7 +958,7 @@ module.exports = HandleMsg = async (pakforlay, message) => {
 			} else {
 				pakforlay.reply(from, `Untuk mengaktifkan simi-simi pada Group Chat\n\nPenggunaan\n${prefix}simi on --mengaktifkan\n${prefix}simi off --nonaktifkan\n`, id)
 			}
-			break
+			break */
 		case 'katakasar':
 			if (!isGroupMsg) return pakforlay.reply(from, 'Maaf, perintah ini hanya dapat dipakai didalam grup!', id)
 			pakforlay.reply(from, `Untuk mengaktifkan Fitur Kata Kasar pada Group Chat\n\napasih itu? fitur apabila seseorang mengucapkan kata kasar akan mendapatkan denda\n\nPenggunaan\n${prefix}kasar on --mengaktifkan\n${prefix}kasar off --nonaktifkan\n\n${prefix}reset --reset jumlah denda`, id)
@@ -1014,8 +1035,8 @@ module.exports = HandleMsg = async (pakforlay, message) => {
             const chatz = await pakforlay.getAllChatIds()
             for (let idk of chatz) {
                 var cvk = await pakforlay.getChatById(idk)
-                if (!cvk.isReadOnly) pakforlay.sendText(idk, `〘 *A R U G A  B C* 〙\n\n${msg}`)
-                if (cvk.isReadOnly) pakforlay.sendText(idk, `〘 *A R U G A  B C* 〙\n\n${msg}`)
+                if (!cvk.isReadOnly) pakforlay.sendText(idk, `〘 *Yaelahdo  B C* 〙\n\n${msg}`)
+                if (cvk.isReadOnly) pakforlay.sendText(idk, `〘 *Yaelahdo  B C* 〙\n\n${msg}`)
             }
             pakforlay.reply(from, 'Broadcast Success!', id)
             break
@@ -1041,7 +1062,7 @@ module.exports = HandleMsg = async (pakforlay, message) => {
         default:
             break
         }
-		
+		/*
 		// Simi-simi function
 		if ((!isCmd && isGroupMsg && isSimi) && message.type === 'chat') {
 			axios.get(`https://arugaz.herokuapp.com/api/simisimi?kata=${encodeURIComponent(message.body)}&apikey=${apiSimi}`)
@@ -1053,7 +1074,7 @@ module.exports = HandleMsg = async (pakforlay, message) => {
 				pakforlay.reply(from, `${err}`, id)
 			})
 		}
-		
+		*/
 		// Kata kasar function
 		if(!isCmd && isGroupMsg && isNgegas) {
             const find = db.get('group').find({ id: groupId }).value()
